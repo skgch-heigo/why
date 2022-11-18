@@ -1,0 +1,50 @@
+import random
+import sys
+
+from PyQt5 import uic  # Импортируем uic
+from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtGui import QPainter, QColor
+
+import UI
+
+
+class MyWidget(QMainWindow, UI.Ui_MainWindow):
+    def __init__(self):
+        super().__init__()
+        self.do_paint = False
+        uic.loadUi('UI.ui', self)  # Загружаем дизайн
+        self.pushButton.clicked.connect(self.run)
+        # Обратите внимание: имя элемента такое же как в QTDesigner
+
+    def paintEvent(self, event):
+        if self.do_paint:
+            # Создаем объект QPainter для рисования
+            qp = QPainter()
+            # Начинаем процесс рисования
+            qp.begin(self)
+            self.draw_circles(qp)
+            # Завершаем рисование
+            qp.end()
+
+    def run(self):
+        self.do_paint = True
+        self.repaint()
+
+    def draw_circles(self, qp):
+        for i in range(random.randint(1, 20)):
+            qp.setBrush(QColor(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)))
+            r = random.randint(10, 200)
+            qp.drawEllipse(random.randint(0, self.size().width()), random.randint(0, self.size().height()),
+                           r, r)
+
+
+def except_hook(cls, exception, traceback):
+    sys.__excepthook__(cls, exception, traceback)
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    form = MyWidget()
+    form.show()
+    sys.excepthook = except_hook
+    sys.exit(app.exec())
